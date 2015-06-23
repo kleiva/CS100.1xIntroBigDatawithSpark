@@ -32,7 +32,7 @@
 # #### The file format of a Google line is:
 #    `"id","name","description","manufacturer","price"`
 
-# In[2]:
+# In[1]:
 
 import re
 DATAFILE_PATTERN = '^(.+),"(.+)",(.*),(.*),(.*)'
@@ -66,7 +66,7 @@ def parseDatafileLine(datafileLine):
         return ((removeQuotes(match.group(1)), product), 1)
 
 
-# In[3]:
+# In[2]:
 
 import sys
 import os
@@ -128,7 +128,7 @@ amazon = loadData(AMAZON_PATH)
 
 # #### Let's examine the lines that were just loaded in the two subset (small) files - one from Google and one from Amazon
 
-# In[4]:
+# In[3]:
 
 for line in googleSmall.take(3):
     print 'google: %s: %s\n' % (line[0], line[1])
@@ -150,7 +150,7 @@ for line in amazonSmall.take(3):
 # #### Implement the function `simpleTokenize(string)` that takes a string and returns a list of non-empty tokens in the string. `simpleTokenize` should split strings using the provided regular expression. Since we want to make token-matching case insensitive, make sure all tokens are turned lower-case. Give an interpretation, in natural language, of what the regular expression, `split_regex`, matches.
 # #### If you need help with Regular Expressions, try the site [regex101](https://regex101.com/) where you can interactively explore the results of applying different regular expressions to strings. *Note that \W includes the "_" character*.  You should use [re.split()](https://docs.python.org/2/library/re.html#re.split) to perform the string split. Also, make sure you remove any empty tokens.
 
-# In[5]:
+# In[4]:
 
 # TODO: Replace <FILL IN> with appropriate code
 quickbrownfox = 'A quick brown fox jumps over the lazy dog.'
@@ -170,7 +170,7 @@ def simpleTokenize(string):
 print simpleTokenize(quickbrownfox) # Should give ['a', 'quick', 'brown', ... ]
 
 
-# In[6]:
+# In[5]:
 
 # TEST Tokenize a String (1a)
 Test.assertEquals(simpleTokenize(quickbrownfox),
@@ -188,7 +188,7 @@ Test.assertEquals(simpleTokenize('fox fox'), ['fox', 'fox'],
 # #### Using the included file "stopwords.txt", implement `tokenize`, an improved tokenizer that does not emit stopwords.
 # [stopwords]: https://en.wikipedia.org/wiki/Stop_words
 
-# In[7]:
+# In[6]:
 
 # TODO: Replace <FILL IN> with appropriate code
 stopfile = os.path.join(baseDir, inputPath, STOPWORDS_PATH)
@@ -208,7 +208,7 @@ def tokenize(string):
 print tokenize(quickbrownfox) # Should give ['quick', 'brown', ... ]
 
 
-# In[8]:
+# In[7]:
 
 # TEST Removing stopwords (1b)
 Test.assertEquals(tokenize("Why a the?"), [], 'tokenize should remove all stopwords')
@@ -221,7 +221,7 @@ Test.assertEquals(tokenize(quickbrownfox), ['quick','brown','fox','jumps','lazy'
 # #### Now let's tokenize the two *small* datasets. For each ID in a dataset, `tokenize` the values, and then count the total number of tokens.
 # #### How many tokens, total, are there in the two datasets?
 
-# In[9]:
+# In[8]:
 
 # TODO: Replace <FILL IN> with appropriate code
 # amazonRecToToken = amazonSmall.<FILL IN>
@@ -244,7 +244,7 @@ totalTokens = countTokens(amazonRecToToken) + countTokens(googleRecToToken)
 print 'There are %s tokens in the combined datasets' % totalTokens
 
 
-# In[10]:
+# In[9]:
 
 # TEST Tokenizing the small datasets (1c)
 Test.assertEquals(totalTokens, 22520, 'incorrect totalTokens')
@@ -254,7 +254,7 @@ Test.assertEquals(totalTokens, 22520, 'incorrect totalTokens')
 # #### Which Amazon record has the biggest number of tokens?
 # #### In other words, you want to sort the records and get the one with the largest count of tokens.
 
-# In[11]:
+# In[10]:
 
 # TODO: Replace <FILL IN> with appropriate code
 def findBiggestRecord(vendorRDD):
@@ -273,7 +273,7 @@ print 'The Amazon record with ID "%s" has the most tokens (%s)' % (biggestRecord
                                                                    len(biggestRecordAmazon[0][1]))
 
 
-# In[12]:
+# In[11]:
 
 # TEST Amazon record with the most tokens (1d)
 Test.assertEquals(biggestRecordAmazon[0][0], 'b000o24l3q', 'incorrect biggestRecordAmazon')
@@ -302,7 +302,7 @@ Test.assertEquals(len(biggestRecordAmazon[0][1]), 1547, 'incorrect len for bigge
 # * #### For each of the tokens in the input `tokens` list, count 1 for each occurance and add the token to the dictionary
 # * #### For each of the tokens in the dictionary, divide the token's count by the total number of tokens in the input `tokens` list
 
-# In[13]:
+# In[12]:
 
 # TODO: Replace <FILL IN> with appropriate code
 def tf(tokens):
@@ -330,7 +330,7 @@ def tf(tokens):
 print tf(tokenize(quickbrownfox)) # Should give { 'quick': 0.1666 ... }
 
 
-# In[14]:
+# In[13]:
 
 # TEST Implement a TF function (2a)
 tf_test = tf(tokenize(quickbrownfox))
@@ -346,14 +346,14 @@ Test.assertEquals(tf_test2, {'one_': 0.6666666666666666, 'two': 0.33333333333333
 # ### **(2b) Create a corpus**
 # #### Create a pair RDD called `corpusRDD`, consisting of a combination of the two small datasets, `amazonRecToToken` and `googleRecToToken`. Each element of the `corpusRDD` should be a pair consisting of a key from one of the small datasets (ID or URL) and the value is the associated value for that key from the small datasets.
 
-# In[15]:
+# In[14]:
 
 # TODO: Replace <FILL IN> with appropriate code
 # corpusRDD = <FILL IN>
 corpusRDD = amazonRecToToken.union(googleRecToToken)
 
 
-# In[16]:
+# In[15]:
 
 # TEST Create a corpus (2b)
 Test.assertEquals(corpusRDD.count(), 400, 'incorrect corpusRDD.count()')
@@ -372,7 +372,7 @@ Test.assertEquals(corpusRDD.count(), 400, 'incorrect corpusRDD.count()')
 # #### Use your `idfs` to compute the IDF weights for all tokens in `corpusRDD` (the combined small datasets).
 # #### How many unique tokens are there?
 
-# In[17]:
+# In[16]:
 
 # TODO: Replace <FILL IN> with appropriate code
 def idfs(corpus):
@@ -404,7 +404,7 @@ uniqueTokenCount = idfsSmall.count()
 print 'There are %s unique tokens in the small datasets.' % uniqueTokenCount
 
 
-# In[18]:
+# In[17]:
 
 # TEST Implement an IDFs function (2c)
 Test.assertEquals(uniqueTokenCount, 4772, 'incorrect uniqueTokenCount')
@@ -417,7 +417,7 @@ Test.assertTrue(abs(tokenSmallestIdf[1] - 4.25531914894) < 0.0000000001,
 # ### **(2d) Tokens with the smallest IDF**
 # #### Print out the 11 tokens with the smallest IDF in the combined small dataset.
 
-# In[19]:
+# In[18]:
 
 smallIDFTokens = idfsSmall.takeOrdered(11, lambda s: s[1])
 print smallIDFTokens
@@ -427,7 +427,7 @@ print smallIDFTokens
 # #### Plot a histogram of IDF values.  Be sure to use appropriate scaling and bucketing for the data.
 # #### First plot the histogram using `matplotlib`
 
-# In[20]:
+# In[19]:
 
 import matplotlib.pyplot as plt
 
@@ -444,7 +444,7 @@ pass
 # * #### Create a Python dictionary where each token maps to the token's frequency times the token's IDF weight
 # #### Use your `tfidf` function to compute the weights of Amazon product record 'b000hkgj8k'. To do this, we need to extract the record for the token from the tokenized small Amazon dataset and we need to convert the IDFs for the small dataset into a Python dictionary. We can do the first part, by using a `filter()` transformation to extract the matching record and a `collect()` action to return the value to the driver. For the second part, we use the [`collectAsMap()` action](http://spark.apache.org/docs/latest/api/python/pyspark.html#pyspark.RDD.collectAsMap) to return the IDFs to the driver as a Python dictionary.
 
-# In[21]:
+# In[20]:
 
 # TODO: Replace <FILL IN> with appropriate code
 def tfidf(tokens, idfs):
@@ -473,7 +473,7 @@ rec_b000hkgj8k_weights = tfidf(recb000hkgj8k, idfsSmallWeights)
 print 'Amazon record "b000hkgj8k" has tokens and weights:\n%s' % rec_b000hkgj8k_weights
 
 
-# In[22]:
+# In[21]:
 
 # TEST Implement a TF-IDF function (2f)
 Test.assertEquals(rec_b000hkgj8k_weights,
@@ -502,7 +502,7 @@ Test.assertEquals(rec_b000hkgj8k_weights,
 # * #### Define a function `norm` that returns the square root of the dot product of a dictionary and itself
 # * #### Define a function `cossim` that returns the dot product of two dictionaries divided by the norm of the first dictionary and then by the norm of the second dictionary
 
-# In[23]:
+# In[22]:
 
 # TODO: Replace <FILL IN> with appropriate code
 import math
@@ -547,7 +547,7 @@ nm = norm(testVec1)
 print dp, nm
 
 
-# In[24]:
+# In[23]:
 
 # TEST Implement the components of a cosineSimilarity function (3a)
 Test.assertEquals(dp, 102, 'incorrect dp')
@@ -560,7 +560,7 @@ Test.assertTrue(abs(nm - 6.16441400297) < 0.0000001, 'incorrrect nm')
 # * #### Apply your `tfidf` function to the tokenized first and second strings, using the dictionary of IDF weights
 # * #### Compute and return your `cossim` function applied to the results of the two `tfidf` functions
 
-# In[25]:
+# In[24]:
 
 # TODO: Replace <FILL IN> with appropriate code
 def cosineSimilarity(string1, string2, idfsDictionary):
@@ -587,7 +587,7 @@ cossimAdobe = cosineSimilarity('Adobe Photoshop',
 print cossimAdobe
 
 
-# In[26]:
+# In[25]:
 
 # TEST Implement a cosineSimilarity function (3b)
 Test.assertTrue(abs(cossimAdobe - 0.0577243382163) < 0.0000001, 'incorrect cossimAdobe')
@@ -603,7 +603,7 @@ Test.assertTrue(abs(cossimAdobe - 0.0577243382163) < 0.0000001, 'incorrect cossi
 # * #### Apply the worker function to every element in the RDD
 # #### Now, compute the similarity between Amazon record `b000o24l3q` and Google record `http://www.google.com/base/feeds/snippets/17242822440574356561`.
 
-# In[27]:
+# In[26]:
 
 # TODO: Replace <FILL IN> with appropriate code
 crossSmall = (googleSmall
@@ -662,7 +662,7 @@ similarityAmazonGoogle = similar('b000o24l3q', 'http://www.google.com/base/feeds
 print 'Requested similarity is %s.' % similarityAmazonGoogle
 
 
-# In[28]:
+# In[27]:
 
 # TEST Perform Entity Resolution (3c)
 Test.assertTrue(abs(similarityAmazonGoogle - 0.000303171940451) < 0.0000001,
@@ -677,7 +677,7 @@ Test.assertTrue(abs(similarityAmazonGoogle - 0.000303171940451) < 0.0000001,
 # * #### Apply the worker function to every element in the RDD
 # #### Again, compute the similarity between Amazon record `b000o24l3q` and Google record `http://www.google.com/base/feeds/snippets/17242822440574356561`.
 
-# In[29]:
+# In[28]:
 
 # TODO: Replace <FILL IN> with appropriate code
 def computeSimilarityBroadcast(record):
@@ -729,7 +729,7 @@ similarityAmazonGoogleBroadcast = similarBroadcast('b000o24l3q', 'http://www.goo
 print 'Requested similarity is %s.' % similarityAmazonGoogleBroadcast
 
 
-# In[30]:
+# In[29]:
 
 # TEST Perform Entity Resolution with Broadcast Variables (3d)
 from pyspark import Broadcast
@@ -742,7 +742,7 @@ Test.assertTrue(abs(similarityAmazonGoogleBroadcast - 0.000303171940451) < 0.000
 # ### **(3e) Perform a Gold Standard evaluation**
 # #### First, we'll load the "gold standard" data and use it to answer several questions. We read and parse the Gold Standard data, where the format of each line is "Amazon Product ID","Google URL". The resulting RDD has elements of the form ("AmazonID GoogleURL", 'gold')
 
-# In[31]:
+# In[30]:
 
 GOLDFILE_PATTERN = '^(.+),(.+)'
 
@@ -801,7 +801,7 @@ assert (gsRaw.count() == (goldStandard.count() + 1))
 # * #### Create a new `nonDupsRDD` RDD that has the just the cosine similarity scores for those "AmazonID GoogleURL" pairs from the `similaritiesBroadcast` RDD that **do not** appear in both the *sims* RDD and gold standard RDD.
 # * #### Compute the average similarity score for non-duplicates in the last datasets. Remember to use `float` for calculation
 
-# In[32]:
+# In[31]:
 
 # TODO: Replace <FILL IN> with appropriate code
 # sims = similaritiesBroadcast.<FILL IN>)
@@ -830,7 +830,7 @@ print 'The average similarity of true duplicates is %s.' % avgSimDups
 print 'And for non duplicates, it is %s.' % avgSimNon
 
 
-# In[33]:
+# In[32]:
 
 # TEST Perform a Gold Standard evaluation (3e)
 Test.assertEquals(trueDupsCount, 146, 'incorrect trueDupsCount')
@@ -851,7 +851,7 @@ Test.assertTrue(abs(avgSimNon - 0.00123476304656) < 0.0000001, 'incorrect avgSim
 # ### **(4a) Tokenize the full dataset**
 # #### Tokenize each of the two full datasets for Google and Amazon.
 
-# In[34]:
+# In[33]:
 
 # TODO: Replace <FILL IN> with appropriate code
 # amazonFullRecToToken = amazon.<FILL IN>
@@ -864,7 +864,7 @@ print 'Amazon full dataset is %s products, Google full dataset is %s products' %
                                                                                     googleFullRecToToken.count())
 
 
-# In[35]:
+# In[34]:
 
 # TEST Tokenize the full dataset (4a)
 Test.assertEquals(amazonFullRecToToken.count(), 1363, 'incorrect amazonFullRecToToken.count()')
@@ -879,7 +879,7 @@ Test.assertEquals(googleFullRecToToken.count(), 3226, 'incorrect googleFullRecTo
 # * #### Create a broadcast variable containing a dictionary of the IDF weights for the full dataset.
 # * #### For each of the Amazon and Google full datasets, create weight RDDs that map IDs/URLs to TF-IDF weighted token vectors.
 
-# In[36]:
+# In[35]:
 
 # TODO: Replace <FILL IN> with appropriate code
 # fullCorpusRDD = <FILL IN>
@@ -907,7 +907,7 @@ print 'There are %s Amazon weights and %s Google weights.' % (amazonWeightsRDD.c
                                                               googleWeightsRDD.count())
 
 
-# In[37]:
+# In[36]:
 
 # TEST Compute IDFs and TF-IDFs for the full datasets (4b)
 Test.assertEquals(idfsFullCount, 17078, 'incorrect idfsFullCount')
@@ -921,7 +921,7 @@ Test.assertEquals(googleWeightsRDD.count(), 3226, 'incorrect googleWeightsRDD.co
 # * #### Create two collections, one for each of the full Amazon and Google datasets, where IDs/URLs map to the norm of the associated TF-IDF weighted token vectors.
 # * #### Convert each collection into a broadcast variable, containing a dictionary of the norm of IDF weights for the full dataset
 
-# In[38]:
+# In[37]:
 
 # TODO: Replace <FILL IN> with appropriate code
 # amazonNorms = amazonWeightsRDD.<FILL IN>
@@ -937,7 +937,7 @@ googleNorms = googleWeightsRDD.map(lambda (k, v): (k, norm(v)))
 googleNormsBroadcast = sc.broadcast(googleNorms.collectAsMap())
 
 
-# In[39]:
+# In[38]:
 
 # TEST Compute Norms for the weights from the full datasets (4c)
 Test.assertTrue(isinstance(amazonNormsBroadcast, Broadcast), 'incorrect amazonNormsBroadcast')
@@ -952,7 +952,7 @@ Test.assertEquals(len(googleNormsBroadcast.value), 3226, 'incorrect googleNormsB
 # * #### Create an invert function that given a pair of (ID/URL, TF-IDF weighted token vector), returns a list of pairs of (token, ID/URL). Recall that the TF-IDF weighted token vector is a Python dictionary with keys that are tokens and values that are weights.
 # * #### Use your invert function to convert the full Amazon and Google TF-IDF weighted token vector datasets into two RDDs where each element is a pair of a token and an ID/URL that contain that token. These are inverted indicies.
 
-# In[40]:
+# In[39]:
 
 # TODO: Replace <FILL IN> with appropriate code
 def invert(record):
@@ -984,7 +984,7 @@ print 'There are %s Amazon inverted pairs and %s Google inverted pairs.' % (amaz
                                                                             googleInvPairsRDD.count())
 
 
-# In[41]:
+# In[40]:
 
 # TEST Create inverted indicies from the full datasets (4d)
 invertedPair = invert((1, {'foo': 2}))
@@ -999,7 +999,7 @@ Test.assertEquals(googleInvPairsRDD.count(), 77678, 'incorrect googleInvPairsRDD
 # * #### We need a mapping from (ID, URL) to token, so create a function that will swap the elements of the RDD you just created to create this new RDD consisting of ((ID, URL), token) pairs.
 # * #### Finally, create an RDD consisting of pairs mapping (ID, URL) to all the tokens the pair shares in common
 
-# In[48]:
+# In[41]:
 
 # TODO: Replace <FILL IN> with appropriate code
 def swap(record):
@@ -1015,12 +1015,17 @@ def swap(record):
     # keys = <FILL IN>
     keys = record[1]
     
+    # used for reduceByKey
     return (keys, {token:1})
+    
+    # used for groupByKey
+    # return (keys, token)
 
 commonTokens = (amazonInvPairsRDD
 #                .<FILL IN>
                 .join(googleInvPairsRDD)
                 .map(swap)
+#                .groupByKey()
                 .reduceByKey(lambda v1,v2: { k:(v1.get(k,0) + v2.get(k,0)) for k in set(v1.keys())|set(v2.keys()) })
                 .cache())
 
@@ -1040,7 +1045,7 @@ Test.assertEquals(commonTokens.count(), 2441100, 'incorrect commonTokens.count()
 # * #### Create a `fastCosinesSimilarity` function that takes in a record consisting of the pair ((Amazon ID, Google URL), tokens list) and computes the sum for each of the tokens in the token list of the products of the Amazon weight for the token times the Google weight for the token. The sum should then be divided by the norm for the Google URL and then divided by the norm for the Amazon ID. The function should return this value in a pair with the key being the (Amazon ID, Google URL). *Make sure you use broadcast variables you created for both the weights and norms*
 # * #### Apply your `fastCosinesSimilarity` function to the common tokens from the full dataset
 
-# In[ ]:
+# In[43]:
 
 # TODO: Replace <FILL IN> with appropriate code
 # amazonWeightsBroadcast = <FILL IN>
@@ -1049,13 +1054,20 @@ amazonWeightsBroadcast = sc.broadcast(amazonWeightsRDD.collectAsMap())
 #googleWeightsBroadcast = <FILL IN>
 googleWeightsBroadcast = sc.broadcast(googleWeightsRDD.collectAsMap())
 
+# for debug
+# longTokens = commonTokens.filter(lambda (k,v): len(v)>1).top(1)[0]
+# print longTokens
+
+# for item in longTokens[1]:
+#      print item
+
 def fastCosineSimilarity(record):
     """ Compute Cosine Similarity using Broadcast variables
     Args:
         record: ((ID, URL), token)
     Returns:
         pair: ((ID, URL), cosine similarity value)
-    """   
+    """      
     # amazonRec = <FILL IN>
     amazonRec = record[0][0]
     
@@ -1066,13 +1078,19 @@ def fastCosineSimilarity(record):
     tokens = record[1]
        
     # s = <FILL IN>
+    # used when reduceByKey in upper (4e)
     s = sum(amazonWeightsBroadcast.value[amazonRec][key] * googleWeightsBroadcast.value[googleRec][key] * tokens[key] for key in tokens.keys())
-     
+    
+    # used when groupByKey in upper (4e)
+    # s = sum(amazonWeightsBroadcast.value[amazonRec][item] * googleWeightsBroadcast.value[googleRec][item] for item in tokens)
+    
     # value = <FILL IN>
     value = s/(amazonNormsBroadcast.value[amazonRec] * googleNormsBroadcast.value[googleRec])
 
     key = (amazonRec, googleRec)
     return (key, value)
+
+# print fastCosineSimilarity(longTokens)
 
 similaritiesFullRDD = (commonTokens
 #                       .<FILL IN>
@@ -1087,7 +1105,7 @@ similaritiesFullRDD = (commonTokens
 print similaritiesFullRDD.count()
 
 
-# In[61]:
+# In[44]:
 
 # TEST Identify common tokens from the full dataset (4f)
 similarityTest = similaritiesFullRDD.filter(lambda ((aID, gURL), cs): aID == 'b00005lzly' and gURL == 'http://www.google.com/base/feeds/snippets/13823221823254120257').collect()
@@ -1110,7 +1128,7 @@ Test.assertEquals(similaritiesFullRDD.count(), 2441100, 'incorrect similaritiesF
 # * #### From this RDD, we create an RDD consisting of only the similarity scores
 # * #### To look up the similarity scores for true duplicates, we perform a left outer join using the `goldStandard` RDD and `simsFullRDD` and extract the
 
-# In[ ]:
+# In[45]:
 
 # Create an RDD of ((Amazon ID, Google URL), similarity score)
 simsFullRDD = similaritiesFullRDD.map(lambda x: ("%s %s" % (x[0][0], x[0][1]), x[1]))
@@ -1147,7 +1165,7 @@ assert(trueDupSimsRDD.count() == 1300)
 # * #### Now, for each similarity score, we can compute the false positives. We do this by adding each similarity score to the appropriate bin of the vector. Then we remove true positives from the vector by using the gold standard data.
 # * #### We define functions for computing false positive and negative and true positives, for a given threshold.
 
-# In[ ]:
+# In[46]:
 
 from pyspark.accumulators import AccumulatorParam
 class VectorAccumulatorParam(AccumulatorParam):
@@ -1215,7 +1233,7 @@ def truepos(threshold):
 # [precision-recall]: https://en.wikipedia.org/wiki/Precision_and_recall
 # [f-measure]: https://en.wikipedia.org/wiki/Precision_and_recall#F-measure
 
-# In[ ]:
+# In[47]:
 
 # Precision = true-positives / (true-positives + false-positives)
 # Recall = true-positives / (true-positives + false-negatives)
@@ -1238,7 +1256,7 @@ def fmeasure(threshold):
 # ### **(5c) Line Plots**
 # #### We can make line plots of precision, recall, and F-measure as a function of threshold value, for thresholds between 0.0 and 1.0.  You can change `nthresholds` (above in part **(5a)**) to change the threshold values to plot.
 
-# In[ ]:
+# In[48]:
 
 thresholds = [float(n) / nthresholds for n in range(0, nthresholds)]
 falseposDict = dict([(t, falsepos(t)) for t in thresholds])

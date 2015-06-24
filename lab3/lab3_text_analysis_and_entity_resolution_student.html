@@ -2379,18 +2379,20 @@ There are 1363 Amazon weights and 3226 Google weights.
     <span class="n">keys</span> <span class="o">=</span> <span class="n">record</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     
     <span class="c"># used for reduceByKey</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="p">{</span><span class="n">token</span><span class="p">:</span><span class="mi">1</span><span class="p">})</span>
+    <span class="c"># return (keys, {token:1})</span>
     
     <span class="c"># used for groupByKey</span>
-    <span class="c"># return (keys, token)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
 
 <span class="n">commonTokens</span> <span class="o">=</span> <span class="p">(</span><span class="n">amazonInvPairsRDD</span>
 <span class="c">#                .&lt;FILL IN&gt;</span>
                 <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">googleInvPairsRDD</span><span class="p">)</span>
                 <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">swap</span><span class="p">)</span>
-<span class="c">#                .groupByKey()</span>
-                <span class="o">.</span><span class="n">reduceByKey</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v1</span><span class="p">,</span><span class="n">v2</span><span class="p">:</span> <span class="p">{</span> <span class="n">k</span><span class="p">:(</span><span class="n">v1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">v2</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">v1</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">|</span><span class="nb">set</span><span class="p">(</span><span class="n">v2</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="p">})</span>
+               <span class="o">.</span><span class="n">groupByKey</span><span class="p">()</span>
+<span class="c">#                .reduceByKey(lambda v1,v2: { k:(v1.get(k,0) + v2.get(k,0)) for k in set(v1.keys())|set(v2.keys()) })</span>
                 <span class="o">.</span><span class="n">cache</span><span class="p">())</span>
+<span class="c"># here, groupByKey() and reduceByKey use almost memory, and one key only with one value only. </span>
+<span class="c"># on the other hand, groupByKey should be faster than reduceByKey with lambda</span>
 
 <span class="k">print</span> <span class="s">&#39;Found </span><span class="si">%d</span><span class="s"> common tokens&#39;</span> <span class="o">%</span> <span class="n">commonTokens</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
 </pre></div>
@@ -2493,10 +2495,10 @@ There are 1363 Amazon weights and 3226 Google weights.
        
     <span class="c"># s = &lt;FILL IN&gt;</span>
     <span class="c"># used when reduceByKey in upper (4e)</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">amazonWeightsBroadcast</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">amazonRec</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">*</span> <span class="n">googleWeightsBroadcast</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">googleRec</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">*</span> <span class="n">tokens</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">tokens</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="c"># s = sum(amazonWeightsBroadcast.value[amazonRec][key] * googleWeightsBroadcast.value[googleRec][key] * tokens[key] for key in tokens.keys())</span>
     
     <span class="c"># used when groupByKey in upper (4e)</span>
-    <span class="c"># s = sum(amazonWeightsBroadcast.value[amazonRec][item] * googleWeightsBroadcast.value[googleRec][item] for item in tokens)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">amazonWeightsBroadcast</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">amazonRec</span><span class="p">][</span><span class="n">item</span><span class="p">]</span> <span class="o">*</span> <span class="n">googleWeightsBroadcast</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">googleRec</span><span class="p">][</span><span class="n">item</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">)</span>
     
     <span class="c"># value = &lt;FILL IN&gt;</span>
     <span class="n">value</span> <span class="o">=</span> <span class="n">s</span><span class="o">/</span><span class="p">(</span><span class="n">amazonNormsBroadcast</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">amazonRec</span><span class="p">]</span> <span class="o">*</span> <span class="n">googleNormsBroadcast</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">googleRec</span><span class="p">])</span>

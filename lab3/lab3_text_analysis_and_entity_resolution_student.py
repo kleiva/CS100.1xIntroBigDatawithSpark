@@ -1016,18 +1016,20 @@ def swap(record):
     keys = record[1]
     
     # used for reduceByKey
-    return (keys, {token:1})
+    # return (keys, {token:1})
     
     # used for groupByKey
-    # return (keys, token)
+    return (keys, token)
 
 commonTokens = (amazonInvPairsRDD
 #                .<FILL IN>
                 .join(googleInvPairsRDD)
                 .map(swap)
-#                .groupByKey()
-                .reduceByKey(lambda v1,v2: { k:(v1.get(k,0) + v2.get(k,0)) for k in set(v1.keys())|set(v2.keys()) })
+               .groupByKey()
+#                .reduceByKey(lambda v1,v2: { k:(v1.get(k,0) + v2.get(k,0)) for k in set(v1.keys())|set(v2.keys()) })
                 .cache())
+# here, groupByKey() and reduceByKey use almost memory, and one key only with one value only. 
+# on the other hand, groupByKey should be faster than reduceByKey with lambda
 
 print 'Found %d common tokens' % commonTokens.count()
 
@@ -1079,10 +1081,10 @@ def fastCosineSimilarity(record):
        
     # s = <FILL IN>
     # used when reduceByKey in upper (4e)
-    s = sum(amazonWeightsBroadcast.value[amazonRec][key] * googleWeightsBroadcast.value[googleRec][key] * tokens[key] for key in tokens.keys())
+    # s = sum(amazonWeightsBroadcast.value[amazonRec][key] * googleWeightsBroadcast.value[googleRec][key] * tokens[key] for key in tokens.keys())
     
     # used when groupByKey in upper (4e)
-    # s = sum(amazonWeightsBroadcast.value[amazonRec][item] * googleWeightsBroadcast.value[googleRec][item] for item in tokens)
+    s = sum(amazonWeightsBroadcast.value[amazonRec][item] * googleWeightsBroadcast.value[googleRec][item] for item in tokens)
     
     # value = <FILL IN>
     value = s/(amazonNormsBroadcast.value[amazonRec] * googleNormsBroadcast.value[googleRec])
